@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>動的なWebサイト</title>
+</head>
+<body>
+    <h1>部屋の情報を入力してください</h1>
+    <form method="POST">
+        <label for="room_description">どんな部屋にしたいか:</label><br>
+        <textarea name="room_description" rows="5" cols="50"></textarea><br>
+        <label for="floor_plan_url">間取り図の写真のURL:</label><br>
+        <input type="text" name="floor_plan_url"><br>
+        <input type="submit" value="送信">
+    </form>
+
+    {% if room_list %}
+        <h2>解析結果と生成された画像</h2>
+        {% for room in room_list %}
+            <h3>{{ room['room_name'] }}</h3>
+            <p>畳数: {{ room['room_size'] }}</p>
+            <p>部屋の説明: {{ room['room_description'] }}</p>
+            {% if generated_images[loop.index0] %}
+                <img src="{{ generated_images[loop.index0] }}" alt="Generated Image">
+            {% else %}
+                <p>画像の生成に失敗しました。</p>
+            {% endif %}
+            <hr>
+        {% endfor %}
+        <form action="/clear_all" method="POST">
+            <input type="submit" value="解析結果と画像を消去">
+        </form>
+    {% endif %}
+</body>
+</html>
