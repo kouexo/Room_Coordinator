@@ -1,9 +1,9 @@
 from flask import Flask, render_template, request, jsonify, session, redirect, url_for
 from openai import OpenAI
 client = OpenAI()
-api_key = ""
+api_key = "APIキーを入力"
 app = Flask(__name__)
-app.secret_key = ""
+app.secret_key = "aaaa"
 
 
 '''解析結果を受け取ってリスト化'''
@@ -19,7 +19,7 @@ def parse_room_descriptions(response_text):
            for line in lines:
                if line.startswith('部屋:'):
                    room_info['room_name'] = line.split(':', 1)[1].strip()
-               elif line.startswith('畳数:'):
+               elif line.startswith('部屋の広さ:'):
                    room_info['room_size'] = line.split(':', 1)[1].strip()
                elif line.startswith('部屋の説明:'):
                    room_info['room_description'] = line.split(':', 1)[1].strip()
@@ -36,14 +36,13 @@ def generate_image(prompt):
     response = client.images.generate(
         model="dall-e-3",  # APIの現在のバージョンに合わせてモデル名を更新
         prompt=prompt,
-        size="1024x1024", #画像サイズを指定1024x1024、1024x1792、1792x1024 
+        size="1024x1024",
         n=1
     )
     # 生成された画像データのURLを取得
     image_url = response.data[0].url
     return image_url
 # --------------------------------------------------
-#画像URLとか２回目の生成で邪魔な要素を削除する
 @app.route('/clear_all', methods=['POST'])
 def clear_all():
     session.pop('room_list', None)
@@ -69,7 +68,7 @@ def index():
         print("間取り図のURL:", floor_plan_url)
 
         model_name = "gpt-4o"
-        prompt = "画像の間取りを解析してください。解析以外の出力は不要です。各部屋について'部屋:子供部屋','畳数:6畳''部屋の説明:主寝室は、最も広い部屋であり、通常は大人が使用する寝室です。北側に位置しており、収納スペースが充実しています。'の形で返答すること。各部屋の解析を*で区切ってください。"
+        prompt = "画像の間取りを解析してください。解析以外の出力は不要です。各部屋について'部屋:子供部屋','部屋の広さ:6平方メートル''部屋の説明:主寝室は、最も広い部屋であり、通常は大人が使用する寝室です。北側に位置しており、収納スペースが充実しています。'の形で返答すること。各部屋の解析を*で区切ってください。"
         image_url = floor_plan_url
         response = client.chat.completions.create(
         model=model_name,
