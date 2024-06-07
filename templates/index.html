@@ -2,8 +2,47 @@
 <html>
 <head>
     <title>動的なWebサイト</title>
+    <style>
+        /* アニメーションのCSS */
+        .fade-in {
+            opacity: 0;
+            transition: opacity 1s ease;
+        }
+        .fade-in.active {
+            opacity: 1;
+        }
+        .image-container {
+            position: relative;
+            margin-bottom: 20px;
+        }
+        .image-container img {
+            display: block;
+            max-width: 100%;
+            height: auto;
+        }
+        .image-container:nth-child(n+2) {
+            margin-top: 40px; /* 画像同士の間隔を調整するためのマージン */
+        }
+        /* 全体のフォント設定 */
+        body {
+            background-color: rgb(255, 245, 200); /* 背景の初期色を設定 */
+            color: #000000; /* 文字の色を設定 */
+            font-family: 'HG行書体', sans-serif;
+            transition: background-color 0.5s;
+        }
+        
+        /* 特定の要素に対するフォント設定 */
+        h1 {
+            font-family: 'HG行書体', sans-serif;
+        }
+        p {
+            font-family:'MingLiU' , serif;
+        }
+    </style>
 </head>
 <body>
+    <iframe width="571" height="470" data-original-width="571" data-original-height="470" src="https://www.thinglink.com/view/scene/1854548228943380966" type="text/html" style="border: none;" webkitallowfullscreen mozallowfullscreen allowfullscreen scrolling="no"></iframe>
+    <script async src="//cdn.thinglink.me/jse/responsive.js"></script>
     <h1>部屋の情報を入力してください</h1>
     <form method="POST">
         <label for="room_description">どんな部屋にしたいか:</label><br>
@@ -12,23 +51,35 @@
         <input type="text" name="floor_plan_url"><br>
         <input type="submit" value="送信">
     </form>
-
     {% if room_list %}
-        <h2>解析結果と生成された画像</h2>
-        {% for room in room_list %}
-            <h3>{{ room['room_name'] }}</h3>
-            <p>畳数: {{ room['room_size'] }}</p>
-            <p>部屋の説明: {{ room['room_description'] }}</p>
-            {% if generated_images[loop.index0] %}
-                <img src="{{ generated_images[loop.index0] }}" alt="Generated Image">
-            {% else %}
-                <p>画像の生成に失敗しました。</p>
-            {% endif %}
-            <hr>
-        {% endfor %}
-        <form action="/clear_all" method="POST">
-            <input type="submit" value="解析結果と画像を消去">
-        </form>
+    <h2>解析結果と生成された画像</h2>
+    {% for room in room_list %}
+    <h3>{{ room['room_name'] }}</h3>
+    <p>畳数: {{ room['room_size'] }}</p>
+    <p>部屋の説明: {{ room['room_description'] }}</p>
+    {% if generated_images[loop.index0] %}
+    <img src="{{ generated_images[loop.index0] }}" alt="Generated Image">
+    {% else %}
+    <p>画像の生成に失敗しました。</p>
     {% endif %}
+    <hr>
+    {% endfor %}
+    <form action="/clear_all" method="POST">
+        <input type="submit" value="解析結果と画像を消去">
+    </form>
+    {% endif %}
+    <script>
+        window.addEventListener('scroll', function() {
+            const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+            const startColor = [255, 245, 200]; // 明るいイエロー
+        const endColor = [255, 200, 120]; // オレンジ系の色
+            const maxScroll = document.body.scrollHeight - window.innerHeight;
+            const scrollFraction = scrollTop / maxScroll;
+            const colorInterpolation = startColor.map((start, index) => {
+                return Math.round(start + (endColor[index] - start) * scrollFraction);
+            });
+            document.body.style.backgroundColor = `rgb(${colorInterpolation.join(',')})`;
+        });
+    </script>
 </body>
 </html>
